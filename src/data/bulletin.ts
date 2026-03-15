@@ -5,21 +5,83 @@ export const houseAddressOptions = [
   'г. Севастополь, пр-т. Октябрьской революции, 48/1',
 ] as const
 
+function toIsoDate(value: Date): string {
+  return value.toISOString().slice(0, 10)
+}
+
+function parseDate(dateString: string): Date | null {
+  if (!dateString) {
+    return null
+  }
+
+  const date = new Date(dateString)
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+export function addDays(dateString: string, days: number): string {
+  const date = parseDate(dateString)
+  if (!date) {
+    return ''
+  }
+
+  date.setDate(date.getDate() + days)
+  return toIsoDate(date)
+}
+
+export function addMonths(dateString: string, months: number): string {
+  const date = parseDate(dateString)
+  if (!date) {
+    return ''
+  }
+
+  const targetDay = date.getDate()
+  date.setMonth(date.getMonth() + months)
+
+  if (date.getDate() !== targetDay) {
+    date.setDate(0)
+  }
+
+  return toIsoDate(date)
+}
+
+export function formatRuDate(dateString: string): string {
+  const date = parseDate(dateString)
+  if (!date) {
+    return '________________'
+  }
+
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(date)
+}
+
 export function createDefaultForm(): BulletinForm {
+  const today = new Date()
+  const noticeDate = new Date(today)
+  noticeDate.setDate(today.getDate() + 10)
+
+  const votingStartDate = new Date(noticeDate)
+  votingStartDate.setDate(noticeDate.getDate() + 10)
+
+  const votingEndDate = new Date(votingStartDate)
+  votingEndDate.setMonth(votingStartDate.getMonth() + 1)
+
   return {
     houseAddress: houseAddressOptions[0],
     managementCompany: '"Стрелецкая бухта"',
     vatRate: '20%',
     meetingType:
       'В форме электронного голосования через Государственную информационную систему жилищно-коммунального хозяйства (ГИС ЖКХ)',
-    meetingDate: '«___» __________ 2026 г.',
-    votingDeadline: '«___» __________ 2026 г. до 20:00',
+    noticeDate: toIsoDate(noticeDate),
+    votingStartDate: toIsoDate(votingStartDate),
+    votingEndDate: toIsoDate(votingEndDate),
     ownerName: '',
     apartment: '',
     area: '',
     ownershipDocument: '',
-    extraNotes:
-      'Заполненный бюллетень передается в управляющую компанию или в счетную комиссию в срок, указанный в бюллетене.',
+    extraNotes: '',
   }
 }
 

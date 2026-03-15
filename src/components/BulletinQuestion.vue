@@ -61,4 +61,29 @@ defineProps<{
     grid-template-columns: 1fr;
   }
 }
+
+@media print {
+  .question-item {
+    break-inside: avoid;
+    border-bottom: 0;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+  }
+
+  .vote-options {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 10px;
+  }
+
+  .vote-options span {
+    min-height: auto;
+    padding: 0 0 6px;
+    border: 0;
+    border-bottom: 1px solid #000;
+    border-radius: 0;
+    justify-content: flex-start;
+    color: #000;
+  }
+}
 </style>

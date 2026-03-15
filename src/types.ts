@@ -3,8 +3,9 @@ export interface BulletinForm {
   managementCompany: string
   vatRate: string
   meetingType: string
-  meetingDate: string
-  votingDeadline: string
+  noticeDate: string
+  votingStartDate: string
+  votingEndDate: string
   ownerName: string
   apartment: string
   area: string
