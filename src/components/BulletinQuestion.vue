@@ -1,19 +1,48 @@
 <script setup lang="ts">
-import type { BulletinQuestion } from '../types'
+import type { BulletinQuestion, VoteChoice } from '../types'
 
 defineProps<{
   question: BulletinQuestion
+  selectedVote?: VoteChoice
+}>()
+
+defineEmits<{
+  select: [payload: { questionId: number; vote: VoteChoice }]
 }>()
 </script>
 
 <template>
   <li class="question-item">
     <h3>{{ question.title }}</h3>
-    <p>{{ question.description }}</p>
+    <p class="question-description">{{ question.description }}</p>
     <div class="vote-options">
-      <span>ЗА</span>
-      <span>ПРОТИВ</span>
-      <span>ВОЗДЕРЖАЛСЯ</span>
+      <button
+        type="button"
+        :class="['vote-button', { active: selectedVote === 'for' }]"
+        :aria-pressed="selectedVote === 'for'"
+        @click="$emit('select', { questionId: question.id, vote: 'for' })"
+      >
+        <span class="vote-indicator" aria-hidden="true"></span>
+        <span class="vote-label">ЗА</span>
+      </button>
+      <button
+        type="button"
+        :class="['vote-button', { active: selectedVote === 'against' }]"
+        :aria-pressed="selectedVote === 'against'"
+        @click="$emit('select', { questionId: question.id, vote: 'against' })"
+      >
+        <span class="vote-indicator" aria-hidden="true"></span>
+        <span class="vote-label">ПРОТИВ</span>
+      </button>
+      <button
+        type="button"
+        :class="['vote-button', { active: selectedVote === 'abstain' }]"
+        :aria-pressed="selectedVote === 'abstain'"
+        @click="$emit('select', { questionId: question.id, vote: 'abstain' })"
+      >
+        <span class="vote-indicator" aria-hidden="true"></span>
+        <span class="vote-label">ВОЗДЕРЖАЛСЯ</span>
+      </button>
     </div>
   </li>
 </template>
@@ -38,6 +67,10 @@ defineProps<{
   margin: 0;
 }
 
+.question-description {
+  margin-bottom: 8px;
+}
+
 .vote-options {
   display: grid;
   grid-template-columns: repeat(3, minmax(90px, 140px));
@@ -45,15 +78,40 @@ defineProps<{
   margin-top: 12px;
 }
 
-.vote-options span {
+.vote-button {
   display: inline-flex;
+  gap: 10px;
   justify-content: center;
   align-items: center;
   min-height: 48px;
-  border: 1px dashed #90a1b8;
+  border: none;
   border-radius: 14px;
+  background: #fff;
+  color: #22324a;
   font-size: 0.9rem;
   font-weight: 600;
+  cursor: pointer;
+}
+
+
+.vote-indicator {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid currentColor;
+  border-radius: 5px;
+  flex: 0 0 auto;
+}
+
+ .vote-button.active .vote-indicator::after {
+    content: "✓";
+    left: 1px;
+    top: -5px;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+.vote-label {
+  line-height: 1;
 }
 
 @media (max-width: 720px) {
@@ -76,14 +134,5 @@ defineProps<{
     margin-top: 10px;
   }
 
-  .vote-options span {
-    min-height: auto;
-    padding: 0 0 6px;
-    border: 0;
-    border-bottom: 1px solid #000;
-    border-radius: 0;
-    justify-content: flex-start;
-    color: #000;
-  }
 }
 </style>

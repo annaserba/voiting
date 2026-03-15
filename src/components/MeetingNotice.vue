@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BulletinForm, BulletinQuestion as Question } from '../types'
+import type { BulletinForm, NumberedBulletinQuestionSection } from '../types'
 
 defineProps<{
   form: BulletinForm
@@ -8,7 +8,7 @@ defineProps<{
     votingStartDate: string
     votingEndDate: string
   }
-  questions: Question[]
+  questionSections: NumberedBulletinQuestionSection[]
 }>()
 </script>
 
@@ -41,17 +41,35 @@ defineProps<{
 
       <div class="agenda">
         <h3>Повестка дня</h3>
-        <ol>
-          <li v-for="question in questions" :key="question.id">
-            <strong>{{ question.title }}</strong>
-            <p>{{ question.description }}</p>
-          </li>
-        </ol>
+        <section
+          v-for="section in questionSections"
+          :key="section.title"
+          class="agenda-section"
+        >
+          <h4>{{ section.title }}</h4>
+          <ol
+            class="agenda-list"
+            :start="section.questions[0]?.displayNumber"
+          >
+            <li v-for="question in section.questions" :key="question.id">
+              <strong>{{ question.title }}</strong>
+              <p>{{ question.description }}</p>
+            </li>
+          </ol>
+        </section>
       </div>
 
-      <div class="notice-footer">
-        <p><strong>Дополнительная информация:</strong> {{ form.extraNotes || 'Отсутствует.' }}</p>
+      <div class="print-signature">
+        <div>
+          <span>Подпись собственника</span>
+          <b></b>
+        </div>
+        <div>
+          <span>Расшифровка подписи</span>
+          <p>{{ form.ownerName || '______________________________' }}</p>
+        </div>
       </div>
+
     </article>
   </section>
 </template>
@@ -133,17 +151,41 @@ defineProps<{
   text-transform: uppercase;
 }
 
-.agenda ol {
+.agenda-section {
+  display: grid;
+  gap: 10px;
+}
+
+.agenda-section + .agenda-section {
+  margin-top: 18px;
+}
+
+.agenda h4 {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #232323;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  break-after: avoid-page;
+  page-break-after: avoid;
+}
+
+.agenda-list {
   margin: 0;
   padding-left: 22px;
 }
 
-.agenda li + li {
+.agenda-list li + li {
   margin-top: 14px;
 }
 
 .agenda p {
   margin: 6px 0 0;
+}
+
+.print-signature {
+  display: none;
 }
 
 @media (max-width: 980px) {
@@ -163,18 +205,21 @@ defineProps<{
 
   .notice-card {
     max-width: none;
-    padding: 0;
+    padding: 0 0 18mm;
     border: 0;
     background: #fff;
+    font-size: 10.5pt;
+    line-height: 1.3;
   }
 
   .document-mark {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    font-size: 8pt;
   }
 
   .notice-card h2 {
-    margin: 0 0 12px;
-    font-size: 18pt;
+    margin: 0 0 10px;
+    font-size: 15pt;
   }
 
   .address-box,
@@ -192,7 +237,7 @@ defineProps<{
   }
 
   .address-box strong {
-    font-size: 13pt;
+    font-size: 11pt;
   }
 
   .notice-meta,
@@ -204,6 +249,51 @@ defineProps<{
 
   .agenda li {
     break-inside: avoid;
+  }
+
+  .agenda-section {
+    gap: 8px;
+  }
+
+  .agenda h4,
+  .agenda-list {
+    font-size: 9.6pt;
+  }
+
+  .agenda-list > li:first-child {
+    break-before: avoid-page;
+    page-break-before: avoid;
+  }
+
+  .print-signature {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    padding-top: 4mm;
+    border-top: 1px solid #000;
+    background: #fff;
+    font-size: 9pt;
+  }
+
+  .print-signature div {
+    display: grid;
+    gap: 4px;
+  }
+
+  .print-signature span,
+  .print-signature p {
+    color: #000;
+    margin: 0;
+  }
+
+  .print-signature b {
+    display: block;
+    min-height: 0;
+    border-bottom: 1px solid #000;
   }
 }
 </style>
